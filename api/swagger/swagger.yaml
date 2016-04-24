@@ -1,0 +1,110 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Scenario Lifecycle Management Proto App (barreleye-proto)
+host: localhost:8088
+# basePath prefixes all resource paths 
+basePath: /v1/api
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+################################################################################
+#                                  Security                                    #
+################################################################################
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: Bearer {access_token}
+    in: header
+paths:
+  /sscenario:
+    x-swagger-router-controller : sscenario
+    post:
+      description: Create new singel scenario
+      operationId: addSingleScenario
+      parameters:
+        - in: body
+          name: body
+          description: Single Scenario object that needs to be added
+          required: true
+          schema:
+            $ref: "#/definitions/SingleScenarioResponse"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SingleScenarioResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - api_key: []
+  /sscenario/{ss_id}:
+    x-swagger-router-controller : sscenario
+    get:
+      description: Returns 'Single scenario' object to the caller
+      operationId: getSingleScenarioById
+      parameters:
+        - name: ss_id
+          in: path
+          description: The id of the single scenario
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SingleScenarioResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - api_key: []
+  /swagger:
+    x-swagger-pipe: swagger_raw
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+  SingleScenarioResponse:
+    type: object
+    properties:
+      ss_id:
+        type: string
+      s_type:
+        type: string
+      s_pattern:
+        type: string
+      s_apply_type:
+        type: string
+      s_run_period:
+        type: string
+      s_detect_action_policy:
+        type: string
+      s_profile_period:
+        type: string
+      s_datetime:
+        type: string
+      s_created_time:
+        description: Epoch time (ms)
+        type: integer
+  ErrorResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
