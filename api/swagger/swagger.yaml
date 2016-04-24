@@ -3,9 +3,9 @@ info:
   version: "0.0.1"
   title: Scenario Lifecycle Management Proto App (barreleye-proto)
 host: localhost:8088
-# basePath prefixes all resource paths 
-basePath: /v1/api
-# 
+# basePath prefixes all resource paths
+basePath: /v1
+#
 schemes:
   # tip: remove http to make production-grade
   - http
@@ -22,39 +22,40 @@ produces:
 securityDefinitions:
   api_key:
     type: apiKey
-    name: Bearer {access_token}
+    name: access_token
     in: header
+################################################################################
+#                                  Paths                                       #
+################################################################################
 paths:
-  /sscenario:
-    x-swagger-router-controller : sscenario
+  /scenarios/single:
+    x-swagger-router-controller : scenarios_single
     post:
-      description: Create new singel scenario
-      operationId: addSingleScenario
+      description: Create new singel scenario object
+      operationId: oper_post
       parameters:
         - in: body
           name: body
           description: Single Scenario object that needs to be added
           required: true
           schema:
-            $ref: "#/definitions/SingleScenarioResponse"
+            $ref: "#/definitions/SingleScenario"
       responses:
         "200":
           description: Success
           schema:
             $ref: "#/definitions/SingleScenarioResponse"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-      security:
-        - api_key: []
-  /sscenario/{ss_id}:
-    x-swagger-router-controller : sscenario
+        "400":
+          description: Invalid scenario supplied
+      # security:
+      #   - api_key: []
+  /scenarios/single/{s_id}:
+    x-swagger-router-controller : scenarios_single
     get:
-      description: Returns 'Single scenario' object to the caller
-      operationId: getSingleScenarioById
+      description: Returns 'Single scenario' object by id to the caller
+      operationId: oper_get
       parameters:
-        - name: ss_id
+        - name: s_id
           in: path
           description: The id of the single scenario
           required: true
@@ -64,22 +65,68 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/SingleScenarioResponse"
-        default:
-          description: Error
+        "404":
+          description: Scenario not found
+        "400":
+          description: Invalid scenario supplied
+      # security:
+      #   - api_key: []
+    put:
+      description: Update 'Single scenario' object
+      operationId: oper_put
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: The id of the single scenario
           schema:
-            $ref: "#/definitions/ErrorResponse"
-      security:
-        - api_key: []
+            $ref: "#/definitions/SingleScenario"
+        - in: path
+          name: s_id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SingleScenarioResponse"
+        "404":
+          description: Scenario not found
+        "400":
+          description: Invalid scenario supplied
+      # security:
+      #   - api_key: []
   /swagger:
     x-swagger-pipe: swagger_raw
 ################################################################################
 #                                 Definitions                                  #
 ################################################################################
 definitions:
+  SingleScenario:
+    type: object
+    properties:
+      s_name:
+        type: string
+      s_type:
+        type: string
+      s_pattern:
+        type: string
+      s_apply_type:
+        type: string
+      s_run_period:
+        type: string
+      s_detect_action_policy:
+        type: string
+      s_profile_period:
+        type: string
+      s_datetime:
+        type: string
   SingleScenarioResponse:
     type: object
     properties:
-      ss_id:
+      s_id:
+        type: string
+      s_name:
         type: string
       s_type:
         type: string
@@ -105,6 +152,4 @@ definitions:
         type: integer
         format: int32
       message:
-        type: string
-      fields:
         type: string
