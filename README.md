@@ -1,1 +1,1 @@
-# barreleye-proto
+# barreleye-prototype
